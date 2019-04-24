@@ -1,8 +1,6 @@
 <?php
 require '../vendor/autoload.php';
 use GuzzleHttp\Client;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 
 $app = new Silex\Application();
@@ -41,12 +39,14 @@ $app->get('/', function (Request $request) use ($app) {
     ]);
 });
 
-$app->post('/streamer', function(Request $request) use ($app) {
-    $username = $request->get('name');
+$app->post('/streamer', function (Request $request) use ($app) {
+    $username = $request->get('streamer');
     $twich_token = $app['session']->get('twich_token');
-    $guzzleClient = new Client(['Authorization' => 'Bearer '.$twich_token['access_token']]);
-    $uri = 'https://api.twitch.tv/helix/users?login='.$username;
-    $response = $guzzleClient->get($uri, []);
+    $guzzleClient = new Client();
+    $uri = 'https://api.twitch.tv/helix/users?login=' . $username;
+    $response = $guzzleClient->get($uri, ['headers' => [
+        'Authorization' => 'Bearer ' . $twich_token['access_token'],
+    ]]);
     echo '<pre>';
     print_r((string) $response->getBody());
 });
