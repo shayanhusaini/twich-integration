@@ -39,4 +39,14 @@ $app->get('/', function (Request $request) use ($app) {
         'is_logged_in' => $is_logged_in,
     ]);
 });
+
+$app->post('/streamer', function(Request $request) use ($app) {
+    $username = $request->get('name');
+    $twich_token = $app['session']->get('twich_token');
+    $guzzleClient = new Client(['Authorization' => 'Bearer '.$twich_token['access_token']]);
+    $uri = 'https://api.twitch.tv/helix/users?login='.$username;
+    $response = $guzzleClient->get($uri, []);
+    echo '<pre>';
+    print_r((string) $response->getBody());
+});
 $app->run();
