@@ -47,7 +47,16 @@ $app->post('/streamer', function (Request $request) use ($app) {
     $response = $guzzleClient->get($uri, ['headers' => [
         'Authorization' => 'Bearer ' . $twich_token['access_token'],
     ]]);
-    echo '<pre>';
-    print_r((string) $response->getBody());
+    $decoded = json_decode((string) $response->getBody(), true);
+    $app['session']->set('favorite_streamer', $decoded);
+    $us_uri = 'https://api.twitch.tv/helix/streams?user_login='.$username;
+    $user_stream = $guzzleClient->get($us_uri, ['headers' => [
+        'Authorization' => 'Bearer ' . $twich_token['access_token'],
+    ]]);
+    $us_decoded = json_decode((string) $user_stream->getBody(), true);
+    $ls_uri = 'https://twitch.tv/streams/'+$us_decoded['id']+'/channel/'+$us_decoded['user_id'];
+    return $app['twig']->render('stream.twig', [
+        'live_stream_url' => $ls_uri
+    ]);
 });
 $app->run();
