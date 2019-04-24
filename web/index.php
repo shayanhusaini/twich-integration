@@ -13,6 +13,11 @@ $app->register(new Silex\Provider\SessionServiceProvider());
 //Register form service
 $app->register(new Silex\Provider\FormServiceProvider());
 
+//Register Translation service
+$app->register(new Silex\Provider\TranslationServiceProvider(), array(
+    'translator.domains' => array(),
+));
+
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile' => 'php://stderr',
