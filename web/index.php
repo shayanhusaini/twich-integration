@@ -11,7 +11,7 @@ $app['debug'] = true;
 $app->register(new Silex\Provider\SessionServiceProvider());
 
 //Register form service
-$app->register(new FormServiceProvider());
+$app->register(new Silex\Provider\FormServiceProvider());
 
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
