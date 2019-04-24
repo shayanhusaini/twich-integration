@@ -28,7 +28,7 @@ $app->get('/', function (Request $request) use ($app) {
         $response = $guzzleClient->post($uri, []);
         //$app['session']->set('twich_token', $response->getBody());
         echo '<pre>';
-        print_r($response);
+        print_r($response->getBody()->getContents());
         echo '</pre>';
     }
 
