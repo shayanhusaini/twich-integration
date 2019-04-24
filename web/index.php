@@ -10,15 +10,6 @@ $app['debug'] = true;
 //Register session service
 $app->register(new Silex\Provider\SessionServiceProvider());
 
-//Register form service
-$app->register(new Silex\Provider\FormServiceProvider());
-
-//Register Translation service
-$app->register(new Silex\Provider\TranslationServiceProvider(), [
-    'translator.domains' => [],
-    'locale' => []
-]);
-
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile' => 'php://stderr',
@@ -41,17 +32,11 @@ $app->get('/', function (Request $request) use ($app) {
         $is_logged_in = true;
     }
 
-    $form = $app['form.factory']->createBuilder(FormType::class, ['name' => 'Streamer Username'])
-            ->add('name')
-            ->add('submit', SubmitType::class, ['label' => 'Save'])
-            ->getForm();
-
     return $app['twig']->render('index.twig', [
         'client_id' => getenv('TWICH_CLIENT_ID'),
         'redirect_url' => getenv('TWICH_REDIRECT_URI'),
         'scope' => 'user_read',
         'is_logged_in' => $is_logged_in,
-        'form' => $form->createView()
     ]);
 });
 $app->run();
