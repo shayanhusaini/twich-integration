@@ -26,7 +26,7 @@ $app->get('/', function (Request $request) use ($app) {
         $guzzleClient = new Client();
         $uri = 'https://id.twitch.tv/oauth2/token?client_id='.getenv('TWICH_CLIENT_ID').'&client_secret='.getenv('TWICH_CLIENT_SECRET').'&code='.$params['code'].'&grant_type=authorization_code&redirect_uri='.getenv('TWICH_REDIRECT_URI');
         $response = $guzzleClient->post($uri, []);
-        $app['session']->set('twich_token', $response->getBody()->getContents());
+        $app['session']->set('twich_token', (string) $response->getBody());
         echo '<pre>';
         print_r($app['session']->get('twich_token'));
         echo '</pre>';
