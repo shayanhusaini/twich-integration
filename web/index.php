@@ -28,7 +28,8 @@ $app->get('/', function (Request $request) use ($app) {
         $guzzleClient = new Client();
         $uri = 'https://id.twitch.tv/oauth2/token?client_id=' . getenv('TWICH_CLIENT_ID') . '&client_secret=' . getenv('TWICH_CLIENT_SECRET') . '&code=' . $params['code'] . '&grant_type=authorization_code&redirect_uri=' . getenv('TWICH_REDIRECT_URI');
         $response = $guzzleClient->post($uri, []);
-        $app['session']->set('twich_token', ['token' => (string) $response->getBody()]);
+        $decode = json_decode((string) $response->getBody(), true);
+        $app['session']->set('twich_token', ['token' => $decode]);
         $is_logged_in = true;
     }
 
