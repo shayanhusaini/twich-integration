@@ -2,6 +2,14 @@
 
 {% block content %}
 <h1>Welcome To Twich</h1>
+{% if is_logged_in == false %}
 <p>Please click on the following button login with Twich</p>
 <a class="btn btn-primary" href="https://id.twitch.tv/oauth2/authorize?client_id={{ client_id }}&redirect_uri={{ redirect_url }}&response_type=code&scope={{ scope }}">Login</a>
+{% else %}
+<form action="#" method="post">
+    {{ form_widget(form) }}
+
+    <input type="submit" name="submit" />
+</form>
+{% endif %}
 {% endblock %}
