@@ -54,10 +54,7 @@ $app->post('/streamer', function (Request $request) use ($app) {
         'Authorization' => 'Bearer ' . $twich_token['access_token'],
     ]]);
     $us_decoded = json_decode((string) $user_stream->getBody(), true);
-    echo '<pre>';
-    print_r($us_decoded);
-    exit;
-    $ls_uri = 'https://twitch.tv/streams/'.$us_decoded['id'].'/channel/'.$us_decoded['user_id'];
+    $ls_uri = 'https://twitch.tv/streams/'.$us_decoded['data'][0]['id'].'/channel/'.$us_decoded['data'][0]['user_id'];
     return $app['twig']->render('stream.twig', [
         'live_stream_url' => $ls_uri
     ]);
