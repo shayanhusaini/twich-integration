@@ -14,9 +14,10 @@ $app->register(new Silex\Provider\SessionServiceProvider());
 $app->register(new Silex\Provider\FormServiceProvider());
 
 //Register Translation service
-$app->register(new Silex\Provider\TranslationServiceProvider(), array(
-    'translator.domains' => array(),
-));
+$app->register(new Silex\Provider\TranslationServiceProvider(), [
+    'translator.domains' => [],
+    'locale' => []
+]);
 
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
