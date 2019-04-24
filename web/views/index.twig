@@ -3,5 +3,5 @@
 {% block content %}
 <h1>Welcome To Twich</h1>
 <p>Please click on the following button login with Twich</p>
-<a class="btn btn-primary" href="https://id.twitch.tv/oauth2/authorize?client_id={% getenv('TWICH_CLIENT_ID') %}&redirect_uri={% getenv('TWICH_REDIRECT_URI') %}&response_type=code&scope=user_read ">Login</a>
+<a class="btn btn-primary" href="https://id.twitch.tv/oauth2/authorize?client_id={% client_id %}&redirect_uri={% redirect_url %}&response_type=code&scope={% scope %}">Login</a>
 {% endblock %}

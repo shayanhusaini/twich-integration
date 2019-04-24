@@ -15,6 +15,10 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 // Our web handlers
 $app->get('/', function() use($app) {
   $app['monolog']->addDebug('logging output.');
-  return $app['twig']->render('index.twig');
+  return $app['twig']->render('index.twig', [
+      'client_id' => getenv('TWICH_CLIENT_ID'),
+      'redirect_url' => getenv('TWICH_REDIRECT_URI'),
+      'scope' => 'user_read'
+  ]);
 });
 $app->run();
