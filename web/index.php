@@ -29,7 +29,7 @@ $app->get('/', function (Request $request) use ($app) {
         $uri = 'https://id.twitch.tv/oauth2/token?client_id=' . getenv('TWICH_CLIENT_ID') . '&client_secret=' . getenv('TWICH_CLIENT_SECRET') . '&code=' . $params['code'] . '&grant_type=authorization_code&redirect_uri=' . getenv('TWICH_REDIRECT_URI');
         $response = $guzzleClient->post($uri, []);
         $decode = json_decode((string) $response->getBody(), true);
-        $app['session']->set('twich_token', ['token' => $decode]);
+        $app['session']->set('twich_token', $decode);
         $is_logged_in = true;
     }
 
@@ -44,9 +44,6 @@ $app->get('/', function (Request $request) use ($app) {
 $app->post('/streamer', function(Request $request) use ($app) {
     $username = $request->get('name');
     $twich_token = $app['session']->get('twich_token');
-    echo '<pre>';
-    var_dump($twich_token);
-    exit;
     $guzzleClient = new Client(['Authorization' => 'Bearer '.$twich_token['access_token']]);
     $uri = 'https://api.twitch.tv/helix/users?login='.$username;
     $response = $guzzleClient->get($uri, []);
