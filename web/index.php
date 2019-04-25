@@ -1,10 +1,42 @@
 <?php
-require '../vendor/autoload.php';
-use GuzzleHttp\Client;
+require __DIR__.'/../vendor/autoload.php';
 use Symfony\Component\HttpFoundation\Request;
+use TwichIntegration\Components\TwichAPI;
 
-$app = new Silex\Application();
+ini_set('display_errors', 1);
+$dotenv = Dotenv\Dotenv::create(__DIR__.'/../');
+$dotenv->load();
+
+$app = new Eole\Sandstone\Application();
 $app['debug'] = true;
+
+// Sandstone requires JMS serializer
+$app->register(new Eole\Sandstone\Serializer\ServiceProvider());
+
+// Register and configure your websocket server
+$app->register(new Eole\Sandstone\Websocket\ServiceProvider(), [
+    'sandstone.websocket.server' => [
+        'bind' => '0.0.0.0',
+        'port' => '25569',
+    ],
+]);
+
+// Register Push Server and ZMQ bridge extension
+$app->register(new \Eole\Sandstone\Push\ServiceProvider());
+$app->register(new \Eole\Sandstone\Push\Bridge\ZMQ\ServiceProvider(), [
+    'sandstone.push.server' => [
+        'bind' => '127.0.0.1',
+        'host' => '127.0.0.1',
+        'port' => 5555,
+    ],
+]);
+
+// Register serializer metadata
+$app['serializer.builder']->addMetadataDir(
+    __DIR__,
+    ''
+);
+
 //Register session service
 $app->register(new Silex\Provider\SessionServiceProvider());
 
@@ -23,11 +55,8 @@ $app->get('/', function (Request $request) use ($app) {
     $is_logged_in = false;
     $params = $request->query->all();
     if (isset($params['code'])) {
-        $guzzleClient = new Client();
-        $uri = 'https://id.twitch.tv/oauth2/token?client_id=' . getenv('TWICH_CLIENT_ID') . '&client_secret=' . getenv('TWICH_CLIENT_SECRET') . '&code=' . $params['code'] . '&grant_type=authorization_code&redirect_uri=' . getenv('TWICH_REDIRECT_URI');
-        $response = $guzzleClient->post($uri, []);
-        $decode = json_decode((string) $response->getBody(), true);
-        $app['session']->set('twich_token', $decode);
+        $twich = new TwichAPI();
+        $app['session']->set('twich_token', $twich->getUser($params['code']));
         $is_logged_in = true;
     }
 
@@ -42,21 +71,15 @@ $app->get('/', function (Request $request) use ($app) {
 $app->post('/streamer', function (Request $request) use ($app) {
     $username = $request->get('streamer');
     $twich_token = $app['session']->get('twich_token');
-    $guzzleClient = new Client();
-    $uri = 'https://api.twitch.tv/helix/users?login=' . $username;
-    $response = $guzzleClient->get($uri, ['headers' => [
-        'Authorization' => 'Bearer ' . $twich_token['access_token'],
-    ]]);
-    $decoded = json_decode((string) $response->getBody(), true);
-    $app['session']->set('favorite_streamer', $decoded);
-    $us_uri = 'https://api.twitch.tv/helix/streams?user_login='.$username;
-    $user_stream = $guzzleClient->get($us_uri, ['headers' => [
-        'Authorization' => 'Bearer ' . $twich_token['access_token'],
-    ]]);
-    $us_decoded = json_decode((string) $user_stream->getBody(), true);
-    $ls_uri = 'https://twitch.tv/streams/'.$us_decoded['data'][0]['id'].'/channel/'.$us_decoded['data'][0]['user_id'];
+    $twich = new TwichAPI();
+    $streamer = $twich->getStreamer($twich_token['access_token'], $username);
+    $app['session']->set('favorite_streamer', $streamer);
+    $userStream = $twich->getStreamByUsername($twich_token['access_token'], $username);
+    $twich->subscribeForEvents($userStream['data'][0]['user_id']);
+    $ls_uri = 'https://twitch.tv/streams/'.$userStream['data'][0]['id'].'/channel/'.$userStream['data'][0]['user_id'];
     return $app['twig']->render('stream.twig', [
         'live_stream_url' => $ls_uri
     ]);
 });
+
 $app->run();

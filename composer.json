@@ -5,9 +5,15 @@
     "twig/twig": "^2.0",
     "symfony/twig-bridge": "^3",
     "vlucas/phpdotenv": "*",
-    "nicklaw5/twitch-api-php": "^2.1"
+    "nicklaw5/twitch-api-php": "^2.1",
+    "eole/sandstone": "^2.1"
   },
   "require-dev": {
     "heroku/heroku-buildpack-php": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "TwichIntegration\\": "web/"
+    }
   }
 }

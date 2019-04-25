@@ -6,7 +6,7 @@
 <p>Please click on the following button login with Twich</p>
 <a class="btn btn-primary" href="https://id.twitch.tv/oauth2/authorize?client_id={{ client_id }}&redirect_uri={{ redirect_url }}&response_type=code&scope={{ scope }}">Login</a>
 {% else %}
-<form action="/streamer" class="form" method="post">
+<form action="{{ redirect_url }}/streamer" class="form" method="post">
     <div class="form-group">
         <label for="streamer">Favorite Streamer:</label>
         <input type="text" class="form-control" id="streamer" name="streamer">
